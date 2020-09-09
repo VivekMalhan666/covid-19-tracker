@@ -11,32 +11,15 @@ import Table from "./Table";
 import Map from "./Map";
 import "./App.css";
 import { sortData } from "./util";
+import LineGraph from "./LineGraph";
 
 function App() {
-  const [countries, setCountries] = useState([]);
-  const [country, setCountry] = useState("worldwide");
+  const [country, setInputCountry] = useState("worldwide");
   const [countryInfo, setCountryInfo] = useState({});
+  const [countries, setCountries] = useState([]);
   const [tableData, setTableData] = useState([]);
 
   //USE EFFECT Implemented for React hooks
-  useEffect(() => {
-    const getCountriesData = async () => {
-      await fetch("https://disease.sh/v3/covid-19/countries")
-        .then((response) => response.json())
-        .then((data) => {
-          const countries = data.map((country) => ({
-            names: country.country,
-            value: country.countryInfo._id,
-          }));
-
-          const sortedData = sortData(data);
-          setCountries(countries);
-          setTableData(sortedData);
-        });
-    };
-    getCountriesData();
-  }, []);
-
   useEffect(() => {
     fetch("https://disease.sh/v3/covid-19/all")
       .then((response) => response.json())
@@ -45,9 +28,25 @@ function App() {
       });
   }, []);
 
-  const onCountryChange = async (event) => {
-    const countryCode = event.target.value;
-    setCountry(countryCode);
+  useEffect(() => {
+    const getCountriesData = async () => {
+      fetch("https://disease.sh/v3/covid-19/countries")
+        .then((response) => response.json())
+        .then((data) => {
+          const countries = data.map((country) => ({
+            name: country.country,
+            value: country.countryInfo.iso2,
+          }));
+          let sortedData = sortData(data);
+          setCountries(countries);
+          setTableData(sortedData);
+        });
+    };
+    getCountriesData();
+  }, []);
+
+  const onCountryChange = async (e) => {
+    const countryCode = e.target.value;
 
     const url =
       countryCode === "worldwide"
@@ -58,7 +57,7 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         setCountryInfo(data);
-        setCountry(countryCode);
+        setInputCountry(countryCode);
       });
   };
 
@@ -106,6 +105,7 @@ function App() {
           <h3>Live Cases by Country</h3>
           <Table countries={tableData} />
           <h3>Worldwide New Cases</h3>
+          <LineGraph />
           {/* Graphs */}
         </CardContent>
       </Card>
