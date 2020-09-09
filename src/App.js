@@ -12,12 +12,15 @@ import Map from "./Map";
 import "./App.css";
 import { sortData } from "./util";
 import LineGraph from "./LineGraph";
+import "leaflet/dist/leaflet.css";
 
 function App() {
   const [country, setInputCountry] = useState("worldwide");
   const [countryInfo, setCountryInfo] = useState({});
   const [countries, setCountries] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [mapCenter, setMapCenter] = useState({ lat: 30.901012, lng: 75.8573 });
+  const [mapZoom, setMapZoom] = useState(6);
 
   //USE EFFECT Implemented for React hooks
   useEffect(() => {
@@ -98,7 +101,7 @@ function App() {
             cases={countryInfo.todayDeaths}
           />
         </div>
-        <Map />
+        <Map center={mapCenter} zoom={mapZoom} />
       </div>
       <Card className="app__right">
         <CardContent>
